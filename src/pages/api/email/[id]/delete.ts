@@ -20,49 +20,21 @@ export async function POST(context: APIContext) {
 			},
 		});
 	}
-	if (!siteConfig.adminEmails.includes(user.email)) {
-		// check if emailapplication user is the one sending the request
-		// if not, return unauthorized
-		const emailApplicationWithUser = await db
-			.selectFrom('EmailApplication')
-			.select((eb) => [
-				'username',
-				'approved',
-				jsonObjectFrom(
-					eb
-						.selectFrom('User')
-						.select(['email'])
-						.whereRef('User.id', '==', 'userId'),
-				).as('applicant'),
-			])
-			.where('id', '==', id as string)
-			.executeTakeFirst();
-
-		// console.log(emailApplicationWithUser);
-
-		if (emailApplicationWithUser?.applicant?.email !== user.email) {
-			return new Response(JSON.stringify({ error: 'Unauthorized' }), {
-				status: 401,
-				headers: {
-					'content-type': 'application/json',
-				},
-			});
-		}
-
-		if (emailApplicationWithUser?.approved === 0) {
-			await db
-				.deleteFrom('EmailApplication')
-				.where('id', '==', id as string)
-				.execute();
-
-			return context.redirect('/portal');
-		}
-	}
 
 	const emailApplication = await db
 		.selectFrom('EmailApplication')
+		.select((eb) => [
+			'username',
+			'approved',
+			'recoveryEmail',
+			jsonObjectFrom(
+				eb
+					.selectFrom('User')
+					.select(['email'])
+					.whereRef('User.id', '==', 'userId'),
+			).as('applicant'),
+		])
 		.where('id', '==', id as string)
-		.selectAll()
 		.executeTakeFirst();
 
 	if (!emailApplication) {
@@ -72,6 +44,27 @@ export async function POST(context: APIContext) {
 				'content-type': 'application/json',
 			},
 		});
+	}
+
+	const isAdmin = siteConfig.adminEmails.includes(user.email);
+	const isApplicant = emailApplication.applicant?.email === user.email;
+
+	if (!isAdmin && !isApplicant) {
+		return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+			status: 401,
+			headers: {
+				'content-type': 'application/json',
+			},
+		});
+	}
+
+	if (emailApplication.approved === 0) {
+		await db
+			.deleteFrom('EmailApplication')
+			.where('id', '==', id as string)
+			.execute();
+
+		return context.redirect('/portal');
 	}
 
 	const res = await ky
