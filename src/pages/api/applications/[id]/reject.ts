@@ -80,7 +80,7 @@ export async function POST(context: APIContext) {
 
 			Here are more details about the application that was rejected:
 			- Requested Email: ${application.username}@ec3.dev
-			- Recovery Email: ${recoveryEmail || 'Unknown'}
+			- Recovery Email: ${recoveryEmail || 'Not set'}
 			- Recovery Phone: ${application.recoveryPhone || 'Not Set'}
 
 			Please contact an administrator if you have any questions.

@@ -7,5 +7,6 @@
 			"name": "ec3-email-reqs-local",
 			"database": "${workspaceFolder:ec3-email-reqs}/prisma/schema.prisma"
 		}
-	]
+	],
+	"typescript.tsdk": "node_modules/typescript/lib"
 }

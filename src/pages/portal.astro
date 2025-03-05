@@ -49,7 +49,7 @@ const applications = await db
 				</thead>
 				<tbody>
 					<!-- row 1 -->
-					{applications.length && applications.map((application, idx) => {
+					{applications.length ? applications.map((application, idx) => {
 						return (
 							<tr>
 								<td>{application.id}</td>
@@ -83,8 +83,7 @@ const applications = await db
 
 							</tr>
 						)
-					})}
-					{!applications.length && (
+					}) : (
 						<tr>
 							<td colspan="7" class="text-center">No pending/approved applications found. Check your recovery email to see if any applications have been rejected.</td>
 						</tr>

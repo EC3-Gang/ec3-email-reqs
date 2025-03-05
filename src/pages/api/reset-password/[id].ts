@@ -4,8 +4,8 @@ import { sha256 } from '@oslojs/crypto/sha2';
 import { encodeHexLowerCase } from '@oslojs/encoding';
 import ky from 'ky';
 
-import type { APIContext } from 'astro';
 import { dedent } from '@/lib/util';
+import type { APIContext } from 'astro';
 
 export async function POST(context: APIContext) {
 	const session = context.locals.session;
@@ -63,12 +63,15 @@ export async function POST(context: APIContext) {
 		.executeTakeFirst();
 
 	if (!emailApplication) {
-		return new Response(JSON.stringify({ error: 'Email application not found' }), {
-			status: 404,
-			headers: {
-				'content-type': 'application/json',
+		return new Response(
+			JSON.stringify({ error: 'Email application not found' }),
+			{
+				status: 404,
+				headers: {
+					'content-type': 'application/json',
+				},
 			},
-		});
+		);
 	}
 
 	const formData = await context.request.formData();
@@ -127,7 +130,7 @@ export async function POST(context: APIContext) {
 			If not, you can now log in to your email account using your new password at https://purelymail.com/user/login, or any other suitable email client that supports IMAP/SMTP.
 
 			- HCI EC³
-		`)
+		`),
 	});
 
 	console.log(emailInfo);

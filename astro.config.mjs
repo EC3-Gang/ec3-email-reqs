@@ -2,22 +2,22 @@
 import { defineConfig } from 'astro/config';
 
 import alpinejs from '@astrojs/alpinejs';
-import tailwind from '@astrojs/tailwind';
 import vue from '@astrojs/vue';
 import icon from 'astro-icon';
 
 import node from '@astrojs/node';
 
+import tailwindcss from '@tailwindcss/vite';
+
 // https://astro.build/config
 export default defineConfig({
-	site: 'https://email-apps.ec3.dev',
+	site: 'https://email-req.ec3.dev',
 	output: 'server',
 	integrations: [
 		alpinejs({
 			entrypoint: 'src/alpine',
 		}),
 		vue(),
-		tailwind(),
 		icon(),
 	],
 	adapter: node({
@@ -25,5 +25,8 @@ export default defineConfig({
 	}),
 	security: {
 		checkOrigin: false,
+	},
+	vite: {
+		plugins: [tailwindcss()],
 	},
 });

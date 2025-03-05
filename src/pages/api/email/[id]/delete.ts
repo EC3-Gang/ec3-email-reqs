@@ -2,10 +2,10 @@ import { db } from '@/lib/db';
 import { transporter } from '@/lib/mail';
 import { siteConfig } from '@/siteConfig';
 
+import { dedent } from '@/lib/util';
 import type { APIContext } from 'astro';
 import ky from 'ky';
 import { jsonObjectFrom } from 'kysely/helpers/sqlite';
-import { dedent } from '@/lib/util';
 
 export async function POST(context: APIContext) {
 	const session = context.locals.session;
@@ -27,10 +27,12 @@ export async function POST(context: APIContext) {
 			.selectFrom('EmailApplication')
 			.select((eb) => [
 				'username',
+				'approved',
 				jsonObjectFrom(
-					eb.selectFrom('User').select([
-						'email',
-					]).whereRef('User.id', '==', 'userId'),
+					eb
+						.selectFrom('User')
+						.select(['email'])
+						.whereRef('User.id', '==', 'userId'),
 				).as('applicant'),
 			])
 			.where('id', '==', id as string)
@@ -45,6 +47,15 @@ export async function POST(context: APIContext) {
 					'content-type': 'application/json',
 				},
 			});
+		}
+
+		if (emailApplicationWithUser?.approved === 0) {
+			await db
+				.deleteFrom('EmailApplication')
+				.where('id', '==', id as string)
+				.execute();
+
+			return context.redirect('/portal');
 		}
 	}
 
@@ -63,15 +74,16 @@ export async function POST(context: APIContext) {
 		});
 	}
 
-	const res = await ky.post('https://purelymail.com/api/v0/deleteUser', {
-		json: {
-			userName: `${emailApplication.username}@ec3.dev`,
-		},
-		headers: {
-			'Purelymail-Api-Token': import.meta.env.PURELYMAIL_API_KEY,
-		},
-	})
-	.json<PurelyMailAPIResponse>();
+	const res = await ky
+		.post('https://purelymail.com/api/v0/deleteUser', {
+			json: {
+				userName: `${emailApplication.username}@ec3.dev`,
+			},
+			headers: {
+				'Purelymail-Api-Token': import.meta.env.PURELYMAIL_API_KEY,
+			},
+		})
+		.json<PurelyMailAPIResponse>();
 
 	if (res.type === 'error') {
 		console.error('Error deleting account', res);
@@ -89,10 +101,10 @@ export async function POST(context: APIContext) {
 		.execute();
 
 	const emailInfo = await transporter.sendMail({
-			from: `"EC3 Email Address Portal" <${import.meta.env.EMAIL_USER}>`,
-			to: user.email || emailApplication.recoveryEmail,
-			subject: 'ec3.dev Email Address Deleted',
-			text: dedent(`
+		from: `"EC3 Email Address Portal" <${import.meta.env.EMAIL_USER}>`,
+		to: user.email || emailApplication.recoveryEmail,
+		subject: 'ec3.dev Email Address Deleted',
+		text: dedent(`
 				Dear ${user?.name || 'Applicant'},
 	
 				Your email address (${emailApplication.username}@ec3.dev) has been deleted.
@@ -101,7 +113,7 @@ export async function POST(context: APIContext) {
 
 				- HCI EC³
 			`),
-		});
+	});
 
 	return context.redirect('/portal');
 }

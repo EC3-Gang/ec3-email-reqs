@@ -28,11 +28,10 @@ const applications = await db
 				Please note that your application will be reviewed before approval. All fields bar the phone number are required.
 			</p>
 			<div class="flex flex-col mt-7 gap-5">
-				<label class="input input-bordered flex items-center gap-2">
+				<label class="input input-bordered flex items-center gap-2 w-full">
 					<span class="icon-[mdi--email] h-4 w-4"></span>
 					<input
 						type="text"
-						class="grow"
 						placeholder="Username"
 						name="username"
 						required
@@ -41,11 +40,10 @@ const applications = await db
 					<span>@ec3.dev</span>
 				</label>
 
-				<label class="input input-bordered flex items-center gap-2">
+				<label class="input input-bordered flex items-center gap-2 w-full">
 					<span class="icon-[mdi--account] h-4 w-4"></span>
 					<input
 						type="email"
-						class="grow"
 						placeholder="Recovery Email"
 						name="recoveryEmail"
 						required
@@ -53,19 +51,19 @@ const applications = await db
 					/>
 				</label>
 
-				<label class="input input-bordered flex items-center gap-2">
+				<label class="input input-bordered flex items-center gap-2 w-full">
 					<span class="icon-[mdi--clipboard-edit-outline] h-4 w-4"></span>
-					<input type="text" class="grow" placeholder="Recovery Email Description" name="recoveryEmailDesc" required aria-required />
+					<input type="text" placeholder="Recovery Email Description" name="recoveryEmailDesc" required aria-required />
 				</label>
 
-				<label class="input input-bordered flex items-center gap-2">
+				<label class="input input-bordered flex items-center gap-2 w-full">
 					<span class="icon-[mdi--lock] h-4 w-4"></span>
-					<input type="password" class="grow" placeholder="Recovery Phone Number" name="recoveryPhone" />
+					<input type="password" placeholder="Recovery Phone Number" name="recoveryPhone" />
 				</label>
 
-				<label class="input input-bordered flex items-center gap-2">
+				<label class="input input-bordered flex items-center gap-2 w-full">
 					<span class="icon-[mdi--clipboard-edit-outline] h-4 w-4"></span>
-					<input type="text" class="grow" placeholder="Recovery Phone Description" name="recoveryPhoneDesc" />
+					<input type="text" placeholder="Recovery Phone Description" name="recoveryPhoneDesc" />
 				</label>
 
 				<button type="submit" class="btn btn-primary">Apply</button>
